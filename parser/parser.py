@@ -1,34 +1,53 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
-import requests
 import time
 import json
+import asyncio
+import aiohttp
+from fake_useragent import UserAgent
 
-URL = 'https://brandshop.ru/sale/'
+user_agent = UserAgent(verify_ssl=False)
+
+
+SOURCE_URL = 'https://brandshop.ru/sale/'
 
 headers = {
-    'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)' \
-        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36'
+    'user-agent': user_agent.random
 }
 
-product_data = {}
 
-def get_data(url):
-    response = requests.get(url=url, headers=headers)
-    with open('first_request.html', 'w') as f:
-        f.write(response.text)
+def has_next_pag(data):
+    soup = BeautifulSoup(data, 'lxml')
+    next_pag = None
+    if soup.find('ul', class_='pagination').find(
+        'li', class_='pagination__item'\
+            ' pagination__item_arrow pagination__item_next'
+    ):
+        next_pag = soup.find('ul', class_='pagination').find(
+            'li', class_='pagination__item pagination__item_arrow'\
+                ' pagination__item_next').find(
+                    'a', class_='pagination__link'
+                ).get('href')
+    return next_pag
 
 
-def get_soup(data):
-    start_time = datetime.now()
-    count = 0
+
+def get_links(data):
+    links = []
     soup = BeautifulSoup(data, 'lxml')
     items = soup.find_all('div', class_='product-card')
     for item in items:
         link = item.find('a', class_='product-card__link').get('href')
-        url = f'https://brandshop.ru{link}'
-        resp = requests.get(url)
-        soup = BeautifulSoup(resp.text, 'lxml')
+        links.append(f'https://brandshop.ru{link}')
+    
+    return links
+
+product_data = {}
+async def get_items(link, session, ind):
+    async with session.get(url=link, headers=headers, ssl=False) as response:
+        print(ind, link)
+        response_text = await response.text()
+        soup = BeautifulSoup(response_text, 'lxml')
         desc = soup.find('div', class_='product-page__header-top').text.strip().split('\n')
         description = '\n'.join([name.strip() for name in desc if name.strip()])
         old_price = soup.find('span', class_='product-order__price_old').text.strip()
@@ -38,25 +57,49 @@ def get_soup(data):
         articul = main_data[0].text
         product_code = int(main_data[1].text)
         product_data[product_code] = {
-            'articul': articul,
-            'description': description,
-            'url': url,
-            'old_price': old_price,
-            'new_price': new_price,
-            'discount': discount,
+        'articul': articul,
+        'description': description,
+        'url': link,
+        'old_price': old_price,
+        'new_price': new_price,
+        'discount': discount,
         }
-        count += 1
-        time.sleep(5)
-        print(f'!!! {count} item downloaded')
-    print(datetime.now() - start_time)
-    return product_data
+        print(f'Item number {ind} {len(product_data)} items DOWNLOADED')
+        return product_data
 
 
-with open('first_request.html', 'r') as f:
-    data = f.read()
+async def get_all_links(url, session):
+    all_links = []
+    async def walk(next_pag):
+        async with session.get(url=f'{url}{next_pag}', headers=headers, ssl=False) as response:
+            response_text = await response.text()
+            page_links = get_links(response_text)
+            all_links.extend(page_links)
+            new_pag = has_next_pag(response_text)
+            if new_pag:
+                await walk(new_pag)
+    await walk('?page=1')
+    return all_links
+    
+
+async def get_all_items(url):
+    conn = aiohttp.TCPConnector()
+    async with aiohttp.ClientSession(connector=conn) as session:
+        all_links = await get_all_links(url, session)
+        tasks = []
+        for ind, link in enumerate(all_links):
+            task = asyncio.create_task(get_items(link, session, ind))
+            tasks.append(task)
+        all_items = await asyncio.gather(*tasks)
+    with open('product_data_async.json', 'w') as file:
+        json.dump(all_items, file, indent=4, ensure_ascii=False)
 
 
-with open('product_data.json', 'w') as f:
-    json.dump(get_soup(data), f, ensure_ascii=False, indent=4)
+def main():
+    asyncio.run(get_all_items(SOURCE_URL))
+    
+    
 
 
+if __name__ == '__main__':
+    main()
