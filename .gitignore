@@ -1,3 +1,6 @@
 .git
 .venv
 dist
+bot/
+__pycache__/
+get_difference/

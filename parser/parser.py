@@ -1,18 +1,13 @@
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 from datetime import datetime
 import time
 import json
 import asyncio
 import aiohttp
-from fake_useragent import UserAgent
-
-user_agent = UserAgent(verify_ssl=False)
-
-
-SOURCE_URL = 'https://brandshop.ru/sale/'
 
 headers = {
-    'user-agent': user_agent.random
+    
 }
 
 
@@ -31,7 +26,6 @@ def has_next_pag(data):
     return next_pag
 
 
-
 def get_links(data):
     links = []
     soup = BeautifulSoup(data, 'lxml')
@@ -42,17 +36,30 @@ def get_links(data):
     
     return links
 
+
 product_data = {}
+
 async def get_items(link, session, ind):
-    async with session.get(url=link, headers=headers, ssl=False) as response:
+    async with session.get(
+        url=link,
+        headers={'user-agent': UserAgent().random},
+        ssl=False
+    ) as response:
         print(ind, link)
+        print(headers)
         response_text = await response.text()
         soup = BeautifulSoup(response_text, 'lxml')
-        desc = soup.find('div', class_='product-page__header-top').text.strip().split('\n')
-        description = '\n'.join([name.strip() for name in desc if name.strip()])
-        old_price = soup.find('span', class_='product-order__price_old').text.strip()
-        new_price = soup.find('div', class_='product-order__price_new').text.strip()
-        discount = soup.find('span', class_='product-order__price-discount').text.strip()
+        desc = soup.find('div', class_='product-page__header-top').\
+            text.strip().split('\n')
+        description = '\n'.join([
+            name.strip() for name in desc if name.strip()
+        ])
+        old_price = soup.find('span', class_='product-order__price_old').\
+            text.strip()
+        new_price = soup.find('div', class_='product-order__price_new').\
+            text.strip()
+        discount = soup.find('span', class_='product-order__price-discount').\
+            text.strip()
         main_data = soup.find_all('div', class_='product-data__name font_m')
         articul = main_data[0].text
         product_code = int(main_data[1].text)
@@ -71,7 +78,11 @@ async def get_items(link, session, ind):
 async def get_all_links(url, session):
     all_links = []
     async def walk(next_pag):
-        async with session.get(url=f'{url}{next_pag}', headers=headers, ssl=False) as response:
+        async with session.get(
+            url=f'{url}{next_pag}',
+            headers=headers,
+            ssl=False
+        ) as response:
             response_text = await response.text()
             page_links = get_links(response_text)
             all_links.extend(page_links)
@@ -79,7 +90,9 @@ async def get_all_links(url, session):
             if new_pag:
                 await walk(new_pag)
     await walk('?page=1')
-    return all_links
+    print('ALL LINKS', len(all_links))
+    print('ALL LINKS SET', len(set(all_links)))
+    return set(all_links)
     
 
 async def get_all_items(url):
@@ -90,16 +103,8 @@ async def get_all_items(url):
         for ind, link in enumerate(all_links):
             task = asyncio.create_task(get_items(link, session, ind))
             tasks.append(task)
-        all_items = await asyncio.gather(*tasks)
-    with open('product_data_async.json', 'w') as file:
-        json.dump(all_items, file, indent=4, ensure_ascii=False)
-
-
-def main():
-    asyncio.run(get_all_items(SOURCE_URL))
+        await asyncio.gather(*tasks)
     
-    
-
-
-if __name__ == '__main__':
-    main()
+    today_items = datetime.strftime(datetime.now(), '%Y_%m_%d')
+    with open(f'data/{today_items}_items_data.json', 'w') as file:
+        json.dump(product_data, file, indent=4, ensure_ascii=False)
