@@ -1,4 +1,21 @@
 [[package]]
+name = "aiogram"
+version = "2.22.1"
+description = "Is a pretty simple and fully asynchronous framework for Telegram Bot API"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+aiohttp = ">=3.8.0,<3.9.0"
+Babel = ">=2.9.1,<2.10.0"
+certifi = ">=2021.10.8"
+
+[package.extras]
+fast = ["uvloop (>=0.16.0,<0.17.0)", "ujson (>=1.35)"]
+proxy = ["aiohttp-socks (>=0.5.3,<0.6.0)"]
+
+[[package]]
 name = "aiohttp"
 version = "3.8.1"
 description = "Async http client/server framework (asyncio)"
@@ -52,6 +69,17 @@ tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)"
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "cloudpickle"]
 
 [[package]]
+name = "babel"
+version = "2.9.1"
+description = "Internationalization utilities"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.dependencies]
+pytz = ">=2015.7"
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
@@ -89,7 +117,7 @@ unicode_backport = ["unicodedata2"]
 name = "fake-useragent"
 version = "0.1.11"
 description = "Up to date simple useragent faker with real world database"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -130,6 +158,25 @@ description = "multidict implementation"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "python-dotenv"
+version = "0.21.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
+name = "pytz"
+version = "2022.2.1"
+description = "World timezone definitions, modern and historical"
+category = "dev"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "requests"
@@ -185,13 +232,15 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "b384e013a31c34f1a935a72f7e66499dd7c148bb4d02abee01c3b24e2833688b"
+content-hash = "60e33f3e8bd13c6d02339177565c2fb5489da920f50b25ba7d58a7757d353cdc"
 
 [metadata.files]
+aiogram = []
 aiohttp = []
 aiosignal = []
 async-timeout = []
 attrs = []
+babel = []
 beautifulsoup4 = []
 certifi = []
 charset-normalizer = []
@@ -200,6 +249,8 @@ frozenlist = []
 idna = []
 lxml = []
 multidict = []
+python-dotenv = []
+pytz = []
 requests = []
 soupsieve = []
 urllib3 = []

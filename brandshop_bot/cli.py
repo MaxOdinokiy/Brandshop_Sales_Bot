@@ -1,7 +1,6 @@
-from parser import parser
-from params import SOURCE_URL
+from brandshop_bot.parser import parser
+from brandshop_bot.params import SOURCE_URL
 import asyncio
-from datetime import datetime
 
 
 def main():

@@ -1,6 +1,6 @@
 .git
 .venv
 dist
-bot/
+.env
 __pycache__/
 get_difference/

@@ -6,10 +6,6 @@ import json
 import asyncio
 import aiohttp
 
-headers = {
-    
-}
-
 
 def has_next_pag(data):
     soup = BeautifulSoup(data, 'lxml')
@@ -46,7 +42,6 @@ async def get_items(link, session, ind):
         ssl=False
     ) as response:
         print(ind, link)
-        print(headers)
         response_text = await response.text()
         soup = BeautifulSoup(response_text, 'lxml')
         desc = soup.find('div', class_='product-page__header-top').\
@@ -80,7 +75,7 @@ async def get_all_links(url, session):
     async def walk(next_pag):
         async with session.get(
             url=f'{url}{next_pag}',
-            headers=headers,
+            headers={'user-agent': UserAgent().random},
             ssl=False
         ) as response:
             response_text = await response.text()
@@ -108,3 +103,4 @@ async def get_all_items(url):
     today_items = datetime.strftime(datetime.now(), '%Y_%m_%d')
     with open(f'data/{today_items}_items_data.json', 'w') as file:
         json.dump(product_data, file, indent=4, ensure_ascii=False)
+

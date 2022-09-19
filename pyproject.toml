@@ -1,8 +1,11 @@
 [tool.poetry]
-name = "brandshop_sales_bot"
+name = "brandshop_bot"
 version = "0.1.0"
 description = ""
 authors = ["Max Odinokiy <max.odinokiy@gmail.com>"]
+packages = [
+  { include = "brandshop_bot" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -13,6 +16,8 @@ beautifulsoup4 = "^4.11.1"
 lxml = "^4.9.1"
 aiohttp = "^3.8.1"
 fake-useragent = "^0.1.11"
+aiogram = "^2.22.1"
+python-dotenv = "^0.21.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
