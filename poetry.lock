@@ -122,6 +122,19 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "flake8"
+version = "5.0.4"
+description = "the modular source code checker: pep8 pyflakes and co"
+category = "dev"
+optional = false
+python-versions = ">=3.6.1"
+
+[package.dependencies]
+mccabe = ">=0.7.0,<0.8.0"
+pycodestyle = ">=2.9.0,<2.10.0"
+pyflakes = ">=2.5.0,<2.6.0"
+
+[[package]]
 name = "frozenlist"
 version = "1.3.1"
 description = "A list-like structure which implements collections.abc.MutableSequence"
@@ -152,12 +165,36 @@ htmlsoup = ["beautifulsoup4"]
 source = ["Cython (>=0.29.7)"]
 
 [[package]]
+name = "mccabe"
+version = "0.7.0"
+description = "McCabe checker, plugin for flake8"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "multidict"
 version = "6.0.2"
 description = "multidict implementation"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "pycodestyle"
+version = "2.9.1"
+description = "Python style guide checker"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "pyflakes"
+version = "2.5.0"
+description = "passive checker of Python programs"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "python-dotenv"
@@ -232,7 +269,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "60e33f3e8bd13c6d02339177565c2fb5489da920f50b25ba7d58a7757d353cdc"
+content-hash = "bb990d48c6588c287cf64485bc95ec86a46f5e864ec4965f34ceac4d3fdfba7a"
 
 [metadata.files]
 aiogram = []
@@ -245,10 +282,14 @@ beautifulsoup4 = []
 certifi = []
 charset-normalizer = []
 fake-useragent = []
+flake8 = []
 frozenlist = []
 idna = []
 lxml = []
+mccabe = []
 multidict = []
+pycodestyle = []
+pyflakes = []
 python-dotenv = []
 pytz = []
 requests = []

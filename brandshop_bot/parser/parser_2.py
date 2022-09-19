@@ -4,8 +4,6 @@ from datetime import datetime
 import asyncio
 import aiohttp
 import json
-import time
-
 
 products_data = {}
 
@@ -17,10 +15,8 @@ async def get_api_data(url, session):
                 'user-agent': UserAgent().random,
                 'accept': 'application/json, text/plain, */*'
             },
-            ssl=False
-        ) as response:
-            return await response.json()
-
+            ssl=False) as response:
+        return await response.json()
 
 
 async def get_pages_count(url, session):
@@ -61,13 +57,13 @@ async def get_all_items():
         pages_count = await get_pages_count(API_URL, session)
         tasks = []
         for i in range(1, pages_count + 1):
-            task = asyncio.create_task(get_items(f'{API_URL}&page={i}', session))
+            task = asyncio.create_task(get_items(f'{API_URL}&page={i}', session)) # noqa
             tasks.append(task)
         await asyncio.gather(*tasks)
-    
+
     today_items = datetime.strftime(datetime.now(), '%Y_%m_%d')
     print(len(products_data))
-    with open(f'brandshop_bot/data/{today_items}_items_data.json', 'w') as file:
+    with open(f'brandshop_bot/data/{today_items}_items_data.json', 'w') as file: # noqa
         json.dump(products_data, file, indent=4, ensure_ascii=False)
 
 
@@ -77,4 +73,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

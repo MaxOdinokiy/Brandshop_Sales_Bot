@@ -4,14 +4,9 @@ from aiogram.utils.markdown import hbold, hlink
 from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
-from brandshop_bot.parser.parser_2 import get_all_items
 import time
 import os
 import json
-from brandshop_bot.params import SOURCE_URL
-import asyncio
-
-
 
 
 load_dotenv()
@@ -35,8 +30,7 @@ async def start(message: types.Message):
     await message.reply(
         "Hi!\nI'm Brandshop_sales_Bot!\nDesigned by Max Odinokiy",
         reply_markup=keyboard
-    ) 
-
+    )
 
 
 @dp.message_handler(Text(equals='Шмотка'))
@@ -44,20 +38,18 @@ async def get_item(message: types.Message):
 
     await message.answer('Please, wait a minute!')
     today_items = datetime.strftime(datetime.now(), '%Y_%m_%d')
-    await get_all_items()
-    
-    with open(f'brandshop_bot/data/{today_items}_items_data.json', 'r') as file:
+
+    with open(f'brandshop_bot/data/{today_items}_items_data.json', 'r') as file: # noqa
         data = json.load(file)
     for key in data:
         item = data.get(key)
         card = f"{hlink(item.get('name'), item.get('url'))}\n" \
-            f"{hbold('Discount: ')} {item.get('discount')}\n" \
-                f"{hbold('Price: ')} {item.get('old_price')}\n" \
-                    f"{hbold('New price: ')} {item.get('new_price')} 🔥 \n"
+            f"{hbold('Discount: ')} {item.get('discount')} %\n" \
+            f"{hbold('Price: ')} {item.get('old_price')} ₽\n" \
+            f"{hbold('New price: ')} {item.get('new_price')} ₽ 🔥🔥🔥 \n" \
+            f"{hbold('Sizes: ')} {item.get('sizes')}"
         await message.answer(card)
         time.sleep(10)
-
-    
 
 
 if __name__ == '__main__':
